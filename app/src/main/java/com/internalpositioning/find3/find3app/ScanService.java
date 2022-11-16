@@ -257,7 +257,12 @@ public class ScanService extends Service {
         }
         bluetoothResults = new JSONObject();
         wifiResults = new JSONObject();
-        BTAdapter.startDiscovery();
+//        BTAdapter.startDiscovery();
+        if (BTAdapter.startDiscovery()) {
+            Log.d(TAG, "started Bluetooth scan");
+        } else {
+            Log.w(TAG, "started Bluetooth scan false?");
+        }
         if (wifi.startScan()) {
             Log.d(TAG, "started wifi scan");
         } else {
