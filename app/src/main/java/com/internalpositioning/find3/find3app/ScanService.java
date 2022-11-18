@@ -70,7 +70,7 @@ public class ScanService extends Service {
 
     // bluetooth scanning
     private BluetoothAdapter BTAdapter = BluetoothAdapter.getDefaultAdapter();
-//    BluetoothBroadcastReceiver receiver = null;
+    BluetoothBroadcastReceiver receiver = null;
 
     // post data request queue
     RequestQueue queue;
@@ -111,7 +111,7 @@ public class ScanService extends Service {
         // register wifi intent filter
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-//        registerReceiver(mWifiScanReceiver, intentFilter);
+        registerReceiver(mWifiScanReceiver, intentFilter);
 
 //        try {
 //            // setup bluetooth
@@ -138,6 +138,14 @@ public class ScanService extends Service {
                     Log.v(LOG_TAG, "beacon name:" + beacon.getName());
                     Log.v(LOG_TAG,"beacon rssi:" + beacon.getRssi());
                     Log.v(LOG_TAG,"beacon Battery Percentage:" + beacon.getBatteryPercent());
+//                    ********************************************************************************************* send data// new code
+                    bluetoothResults = new JSONObject();
+                    try {
+                        bluetoothResults.put(beacon.getName(), beacon.getRssi());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+//                    **************************************************************************
                     for (KBAdvPacketBase advPacket : beacon.allAdvPackets()){
                         switch (advPacket.getAdvType()){
                             case KBAdvType.Sensor:
@@ -161,6 +169,9 @@ public class ScanService extends Service {
                     //clear all scanned packet
                     beacon.removeAdvPacket();
                 }
+//                ***************************************************************************
+                sendData();
+//                ***************************************************************************
             }
             public void onCentralBleStateChang(int nNewState)
             {
@@ -318,49 +329,49 @@ public class ScanService extends Service {
     public void onDestroy() {
         // The service is no longer used and is being destroyed
         Log.v(TAG, "onDestroy");
-//        try {
-//            if (receiver != null)
-//                unregisterReceiver(receiver);
-//        } catch (Exception e) {
-//            Log.w(TAG, e.toString());
-//        }
-//        try {
-//            if (mWifiScanReceiver != null)
-//                unregisterReceiver(mWifiScanReceiver);
-//        } catch (Exception e) {
-//            Log.w(TAG, e.toString());
-//        }
+        try {
+            if (receiver != null)
+                unregisterReceiver(receiver);
+        } catch (Exception e) {
+            Log.w(TAG, e.toString());
+        }
+        try {
+            if (mWifiScanReceiver != null)
+                unregisterReceiver(mWifiScanReceiver);
+        } catch (Exception e) {
+            Log.w(TAG, e.toString());
+        }
         stopSelf();
         super.onDestroy();
 
     }
 
-//    private final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context c, Intent intent) {
-//            // This condition is not necessary if you listen to only one action
-//            if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
-//                Log.d(TAG, "timer off, trying to send data");
-//                List<ScanResult> wifiScanList = wifi.getScanResults();
-//                for (int i = 0; i < wifiScanList.size(); i++) {
-//                    String name = wifiScanList.get(i).BSSID.toLowerCase();
-//                    int rssi = wifiScanList.get(i).level;
-//                    Log.v(TAG, "wifi: " + name + " => " + rssi + "dBm");
-//                    try {
-//                        wifiResults.put(name, rssi);
-//                    } catch (Exception e) {
-//                        Log.e(TAG, e.toString());
-//                    }
-//                }
-//                sendData();
-//                BTAdapter.cancelDiscovery();
-//                BTAdapter = BluetoothAdapter.getDefaultAdapter();
-//                synchronized (lock) {
-//                    isScanning = false;
-//                }
-//            }
-//        }
-//    };
+    private final BroadcastReceiver mWifiScanReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context c, Intent intent) {
+            // This condition is not necessary if you listen to only one action
+            if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
+                Log.d(TAG, "timer off, trying to send data");
+                List<ScanResult> wifiScanList = wifi.getScanResults();
+                for (int i = 0; i < wifiScanList.size(); i++) {
+                    String name = wifiScanList.get(i).BSSID.toLowerCase();
+                    int rssi = wifiScanList.get(i).level;
+                    Log.v(TAG, "wifi: " + name + " => " + rssi + "dBm");
+                    try {
+                        wifiResults.put(name, rssi);
+                    } catch (Exception e) {
+                        Log.e(TAG, e.toString());
+                    }
+                }
+                sendData();
+                BTAdapter.cancelDiscovery();
+                BTAdapter = BluetoothAdapter.getDefaultAdapter();
+                synchronized (lock) {
+                    isScanning = false;
+                }
+            }
+        }
+    };
 
     private void doScan() {
         synchronized (lock) {
@@ -386,25 +397,25 @@ public class ScanService extends Service {
     }
 
     // bluetooth reciever
-//    private class BluetoothBroadcastReceiver extends BroadcastReceiver {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            String action = intent.getAction();
-//            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-//                int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-//                String name = device.getAddress().toLowerCase();
-//                Log.v(TAG, "bluetooth: " + name + " => " + rssi + "dBm");
-//                try {
-//                    bluetoothResults.put(name, rssi);
-//                } catch (Exception e) {
-//                    Log.e(TAG, e.toString());
-//                }
-//            }
-//        }
-//    }
-//
-//    ;
+    private class BluetoothBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                int rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                String name = device.getAddress().toLowerCase();
+                Log.v(TAG, "bluetooth: " + name + " => " + rssi + "dBm");
+                try {
+                    bluetoothResults.put(name, rssi);
+                } catch (Exception e) {
+                    Log.e(TAG, e.toString());
+                }
+            }
+        }
+    }
+
+    ;
 
 
     public void sendData() {
@@ -430,6 +441,7 @@ public class ScanService extends Service {
             }
 
             final String mRequestBody = jsonBody.toString();
+            Log.d("tag send data: ", mRequestBody);
             Log.d(TAG, mRequestBody);
 
             StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
@@ -470,6 +482,7 @@ public class ScanService extends Service {
 
             queue.add(stringRequest);
         } catch (JSONException e) {
+            System.out.println("no data sent!");
             e.printStackTrace();
         }
     }
