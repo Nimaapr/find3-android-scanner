@@ -39,6 +39,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
@@ -127,6 +128,21 @@ public class MainActivity extends AppCompatActivity {
         TextView rssi_msg = (TextView) findViewById(R.id.textOutput);
         rssi_msg.setText("not running");
 
+//        ************************************************************************************
+        //        4.2.Request permission:
+        //for android6, the app need corse location permission for BLE scanning
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        }
+//for android10, the app need fine location permission for BLE scanning
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+//        ************************************************************************************
 
         // check to see if there are preferences
         SharedPreferences sharedPref = MainActivity.this.getPreferences(Context.MODE_PRIVATE);

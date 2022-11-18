@@ -18,6 +18,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -35,6 +36,19 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+
+//************************************************
+import com.kkmcn.kbeaconlib2.KBAdvPackage.KBAccSensorValue;
+import com.kkmcn.kbeaconlib2.KBAdvPackage.KBAdvPacketBase;
+import com.kkmcn.kbeaconlib2.KBAdvPackage.KBAdvPacketEddyTLM;
+import com.kkmcn.kbeaconlib2.KBAdvPackage.KBAdvPacketSensor;
+import com.kkmcn.kbeaconlib2.KBAdvPackage.KBAdvPacketSystem;
+import com.kkmcn.kbeaconlib2.KBAdvPackage.KBAdvType;
+import com.kkmcn.kbeaconlib2.KBeacon;
+import com.kkmcn.kbeaconlib2.KBeaconsMgr;
+//************************************************
+
+
 
 /**
  * Created by zacks on 3/2/2018.
@@ -70,6 +84,20 @@ public class ScanService extends Service {
     private String serverAddress = "";
     private boolean allowGPS = false;
 
+//    *****************************************************************
+//    private final static String TAG = "beacon.KBeaconsMgr";
+    private final static String LOG_TAG = "beacon.KBeaconsMgr";
+
+    private static final int PERMISSION_COARSE_LOCATION = 1;
+    private static final int PERMISSION_FINE_LOCATION = 1;
+//    Button startScanningButton;
+//    TextView Helloworld;
+
+    private KBeaconsMgr mBeaconsMgr;
+    private KBeaconsMgr.KBeaconMgrDelegate beaconMgrDeletate;
+    private KBeaconsMgr.KBeaconMgrDelegate beaconMgrExample;
+//    *****************************************************************
+
     @Override
     public void onCreate() {
         // The service is being created
@@ -95,6 +123,69 @@ public class ScanService extends Service {
 //        } catch (Exception e) {
 //            Log.e(TAG, e.toString());
 //        }
+
+//        ******************************************************************************
+//        KBeaconsMgr.KBeaconMgrDelegate beaconMgrExample = new KBeaconsMgr.KBeaconMgrDelegate()
+        beaconMgrExample = new KBeaconsMgr.KBeaconMgrDelegate()
+        {
+            //get advertisement packet during scanning callback
+            public void onBeaconDiscovered(KBeacon[] beacons)
+            {
+                for (KBeacon beacon: beacons)
+                {
+                    //get beacon adv common info
+                    Log.v(LOG_TAG, "beacon mac:" + beacon.getMac());
+                    Log.v(LOG_TAG, "beacon name:" + beacon.getName());
+                    Log.v(LOG_TAG,"beacon rssi:" + beacon.getRssi());
+                    Log.v(LOG_TAG,"beacon Battery Percentage:" + beacon.getBatteryPercent());
+                    for (KBAdvPacketBase advPacket : beacon.allAdvPackets()){
+                        switch (advPacket.getAdvType()){
+                            case KBAdvType.Sensor:
+                            {
+                                KBAdvPacketSensor advSensor = (KBAdvPacketSensor)advPacket;
+                                Log.v(LOG_TAG,"Sensor battery level:" + advSensor.getBatteryLevel());
+                                Log.v(LOG_TAG,"Sensor temp:" + advSensor.getTemperature());
+//                                Log.v(LOG_TAG,"Sensor humidity:" + advSensor.getHumidity());
+//                                KBAccSensorValue accPos = advSensor.getAccSensor();
+//                                if (accPos != null) {
+//                                    String strAccValue = String.format(Locale.ENGLISH, "x:%d; y:%d; z:%d",
+//                                            accPos.xAis, accPos.yAis, accPos.zAis);
+//                                    Log.v(LOG_TAG,"Sensor Acc:" + strAccValue);
+//                                }
+                                break;
+                            }
+                            default:
+                                break;
+                        }
+                    }
+                    //clear all scanned packet
+                    beacon.removeAdvPacket();
+                }
+            }
+            public void onCentralBleStateChang(int nNewState)
+            {
+                Log.e(TAG, "centralBleStateChang：" + nNewState);
+            }
+
+            public void onScanFailed(int errorCode)
+            {
+                // empty
+            }
+        };
+        mBeaconsMgr = KBeaconsMgr.sharedBeaconManager(this);
+//        if (mBeaconsMgr == null)
+//        {
+//            Toast.makeText(this, "Make sure the phone supports BLE function!",
+//                    Toast.LENGTH_LONG).show();
+////            toastShow("Make sure the phone supports BLE function");
+//            return;
+//        }
+//        else{
+//            Toast.makeText(this, "This is my second Toast message!",
+//                    Toast.LENGTH_LONG).show();
+//        }
+
+//        ******************************************************************************
     }
 
 
@@ -179,7 +270,30 @@ public class ScanService extends Service {
 //                40000
 //        );
 
-        return START_STICKY;
+//        *********************************************************************
+        mBeaconsMgr.delegate = beaconMgrExample;
+        int nStartScan = mBeaconsMgr.startScanning();
+        if (nStartScan == 0) {
+            Log.v(TAG, "start scan success");
+            Toast.makeText(this, "Jahan jigare mani",
+                    Toast.LENGTH_LONG).show();
+        } else if (nStartScan == KBeaconsMgr.SCAN_ERROR_BLE_NOT_ENABLE) {
+            Toast.makeText(this, "BLE function is not enable",
+                    Toast.LENGTH_LONG).show();
+//            toastShow("BLE function is not enable");
+        } else if (nStartScan == KBeaconsMgr.SCAN_ERROR_NO_PERMISSION) {
+            Toast.makeText(this, "BLE scanning has no location permission",
+                    Toast.LENGTH_LONG).show();
+//            toastShow("BLE scanning has no location permission");
+        } else {
+            Toast.makeText(this, "BLE scanning unknown error",
+                    Toast.LENGTH_LONG).show();
+//            toastShow("BLE scanning unknown error");
+            System.out.println("nStartScan:");
+            System.out.println(nStartScan);
+        }
+//        *********************************************************************
+            return START_STICKY;
     }
 
     @Override
