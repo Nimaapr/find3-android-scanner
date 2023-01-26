@@ -1,5 +1,10 @@
 package com.internalpositioning.find3.find3app;
 
+// Sight in site
+// Changes in the names:
+// Family: Site
+// Name: Worker
+
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.Notification;

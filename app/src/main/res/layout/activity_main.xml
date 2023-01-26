@@ -46,7 +46,7 @@
             android:paddingLeft="24dp"
             android:paddingRight="24dp"
             android:paddingTop="4dp"
-            android:text="Instructions: Enter your family name, device and then press 'Scan' and wait." />
+            android:text="Instructions: Enter your Site name, your name and then press 'Scan' and wait." />
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/relLayout6"
         android:layout_width="match_parent"
@@ -57,7 +57,7 @@
             android:id="@+id/familyLabel"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:text="Family:" />
+            android:text="Site:" />
         <EditText
             android:id="@+id/familyName"
             android:layout_width="220dp"
@@ -78,7 +78,7 @@
             android:id="@+id/deviceLabel"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:text="Device:" />
+            android:text="Name:" />
         <EditText
             android:id="@+id/deviceName"
             android:layout_width="220dp"
@@ -108,7 +108,7 @@
             android:ems="10"
             android:gravity="center"
             android:inputType="textUri|textPersonName"
-            android:text="https://cloud.internalpositioning.com"
+            android:text="https://Localhost:18003"
             android:textSize="12sp" />
 
     </LinearLayout>
