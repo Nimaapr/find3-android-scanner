@@ -90,8 +90,7 @@ public class ScanService extends Service {
 
     private static final int PERMISSION_COARSE_LOCATION = 1;
     private static final int PERMISSION_FINE_LOCATION = 1;
-//    Button startScanningButton;
-//    TextView Helloworld;
+
 
     private KBeaconsMgr mBeaconsMgr;
     private KBeaconsMgr.KBeaconMgrDelegate beaconMgrDeletate;
@@ -114,20 +113,9 @@ public class ScanService extends Service {
         intentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         registerReceiver(mWifiScanReceiver, intentFilter);
 
-//        try {
-//            // setup bluetooth
-//            Log.d(TAG, "setting up bluetooth");
-//            if (receiver == null) {
-//                receiver = new BluetoothBroadcastReceiver();
-//                registerReceiver(receiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-//            }
-//        } catch (Exception e) {
-//            Log.e(TAG, e.toString());
-//        }
-
 //        ******************************************************************************
 //        KBeaconsMgr.KBeaconMgrDelegate beaconMgrExample = new KBeaconsMgr.KBeaconMgrDelegate()
-//        Next two lines should change. They are only for sending every 6 values. Is next line really necessary?  
+//        Next two lines should change. They are only for sending every 6 values. Is next line really necessary?
         bluetoothResults = new JSONObject();
         counter_n=0;
         beaconMgrExample = new KBeaconsMgr.KBeaconMgrDelegate()
@@ -198,17 +186,7 @@ public class ScanService extends Service {
             }
         };
         mBeaconsMgr = KBeaconsMgr.sharedBeaconManager(this);
-//        if (mBeaconsMgr == null)
-//        {
-//            Toast.makeText(this, "Make sure the phone supports BLE function!",
-//                    Toast.LENGTH_LONG).show();
-////            toastShow("Make sure the phone supports BLE function");
-//            return;
-//        }
-//        else{
-//            Toast.makeText(this, "This is my second Toast message!",
-//                    Toast.LENGTH_LONG).show();
-//        }
+
 
 //        ******************************************************************************
     }
@@ -225,75 +203,7 @@ public class ScanService extends Service {
 
         Log.d(TAG, "familyName: " + familyName);
 
-//        new java.util.Timer().schedule(
-//                new java.util.TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        synchronized (lock) {
-//                            if (isScanning == false) {
-//                                doScan();
-//                            }
-//                        }
-//                    }
-//                },
-//                0
-//        );
-//
-//
-//        new java.util.Timer().schedule(
-//                new java.util.TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        synchronized (lock) {
-//                            if (isScanning == false) {
-//                                doScan();
-//                            }
-//                        }
-//                    }
-//                },
-//                10000
-//        );
-//
-//        new java.util.Timer().schedule(
-//                new java.util.TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        synchronized (lock) {
-//                            if (isScanning == false) {
-//                                doScan();
-//                            }
-//                        }
-//                    }
-//                },
-//                20000
-//        );
-//        new java.util.Timer().schedule(
-//                new java.util.TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        synchronized (lock) {
-//                            if (isScanning == false) {
-//                                doScan();
-//                            }
-//                        }
-//                    }
-//                },
-//                30000
-//        );
-//        new java.util.Timer().schedule(
-//                new java.util.TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        synchronized (lock) {
-//                            if (isScanning == false) {
-//                                doScan();
-//                            }
-//                        }
-//                        stopSelf(); // stop the service
-//                    }
-//                },
-//                40000
-//        );
+
 
 //        *********************************************************************
         mBeaconsMgr.delegate = beaconMgrExample;
@@ -396,18 +306,7 @@ public class ScanService extends Service {
         }
         bluetoothResults = new JSONObject();
         wifiResults = new JSONObject();
-//        BTAdapter.startDiscovery();
-//        if (BTAdapter.startDiscovery()) {
-//            Log.d(TAG, "started Bluetooth scan");
-//        } else {
-//            Log.w(TAG, "started Bluetooth scan false?");
-//        }
-//        if (wifi.startScan()) {
-//            Log.d(TAG, "started wifi scan");
-//        } else {
-//            Log.w(TAG, "started wifi scan false?");
-//        }
-//        Log.d(TAG, "started discovery");
+
     }
 
     // bluetooth reciever
