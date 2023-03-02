@@ -96,6 +96,7 @@ public class ScanService extends Service {
     private KBeaconsMgr mBeaconsMgr;
     private KBeaconsMgr.KBeaconMgrDelegate beaconMgrDeletate;
     private KBeaconsMgr.KBeaconMgrDelegate beaconMgrExample;
+    int counter_n;
 //    *****************************************************************
 
     @Override
@@ -126,6 +127,9 @@ public class ScanService extends Service {
 
 //        ******************************************************************************
 //        KBeaconsMgr.KBeaconMgrDelegate beaconMgrExample = new KBeaconsMgr.KBeaconMgrDelegate()
+//        Next two lines should change. They are only for sending every 6 values. Is next line really necessary?  
+        bluetoothResults = new JSONObject();
+        counter_n=0;
         beaconMgrExample = new KBeaconsMgr.KBeaconMgrDelegate()
         {
             //get advertisement packet during scanning callback
@@ -138,8 +142,11 @@ public class ScanService extends Service {
                     Log.v(LOG_TAG, "beacon name:" + beacon.getName());
                     Log.v(LOG_TAG,"beacon rssi:" + beacon.getRssi());
                     Log.v(LOG_TAG,"beacon Battery Percentage:" + beacon.getBatteryPercent());
+                    String firstThree = beacon.getName().substring(0, 3);
+                    if (beacon.getRssi()<-85 && !firstThree.equals("St_")){
+                        continue;
+                    }
 //                    ********************************************************************************************* send data// new code
-                    bluetoothResults = new JSONObject();
                     try {
                         bluetoothResults.put(beacon.getName(), beacon.getRssi());
                     } catch (JSONException e) {
@@ -170,7 +177,14 @@ public class ScanService extends Service {
                     beacon.removeAdvPacket();
                 }
 //                ***************************************************************************
-                sendData();
+                counter_n=counter_n+1;
+                Log.d(TAG, "counter n value："+ counter_n);
+                Log.d(TAG, "bluetooth results:"+ bluetoothResults);
+                if (bluetoothResults.length()>5 && counter_n>6){
+                    Log.e(TAG, "send data objects："+ bluetoothResults);
+                    counter_n=0;
+                    sendData();
+                }
 //                ***************************************************************************
             }
             public void onCentralBleStateChang(int nNewState)
