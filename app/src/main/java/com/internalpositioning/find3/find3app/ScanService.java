@@ -168,6 +168,7 @@ public class ScanService extends Service {
                 counter_n=counter_n+1;
                 Log.d(TAG, "counter n value："+ counter_n);
                 Log.d(TAG, "bluetooth results:"+ bluetoothResults);
+//                second condition only in learning
                 if (bluetoothResults.length()>5 && counter_n>6){
                     Log.e(TAG, "send data objects："+ bluetoothResults);
                     counter_n=0;
@@ -297,17 +298,7 @@ public class ScanService extends Service {
         }
     };
 
-    private void doScan() {
-        synchronized (lock) {
-            if (isScanning == true) {
-                return;
-            }
-            isScanning = true;
-        }
-        bluetoothResults = new JSONObject();
-        wifiResults = new JSONObject();
 
-    }
 
     // bluetooth reciever
     private class BluetoothBroadcastReceiver extends BroadcastReceiver {
