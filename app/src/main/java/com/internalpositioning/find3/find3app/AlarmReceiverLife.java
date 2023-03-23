@@ -27,7 +27,10 @@ public class AlarmReceiverLife extends BroadcastReceiver {
         String locationName = intent.getStringExtra("locationName");
         String serverAddress = intent.getStringExtra("serverAddress");
         boolean allowGPS = intent.getBooleanExtra("allowGPS",false);
+        boolean isToggleScanTypeChecked = intent.getBooleanExtra("isToggleScanTypeChecked", false);
+
         Log.d(TAG,"familyName: "+ familyName);
+        Log.d(TAG,"isToggleScanTypeChecked: "+ isToggleScanTypeChecked);
 
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK |
@@ -40,6 +43,7 @@ public class AlarmReceiverLife extends BroadcastReceiver {
         scanService.putExtra("locationName",locationName);
         scanService.putExtra("serverAddress",serverAddress);
         scanService.putExtra("allowGPS",allowGPS);
+        scanService.putExtra("isToggleScanTypeChecked", isToggleScanTypeChecked);
         try {
             context.startService(scanService);
         } catch (Exception e) {

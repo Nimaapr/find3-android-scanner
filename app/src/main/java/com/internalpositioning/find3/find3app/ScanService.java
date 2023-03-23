@@ -83,6 +83,7 @@ public class ScanService extends Service {
     private String deviceName = "";
     private String serverAddress = "";
     private boolean allowGPS = false;
+    private boolean isToggleScanTypeChecked=false;
 
 //    *****************************************************************
 //    private final static String TAG = "beacon.KBeaconsMgr";
@@ -169,8 +170,15 @@ public class ScanService extends Service {
                 Log.d(TAG, "counter n value："+ counter_n);
                 Log.d(TAG, "bluetooth results:"+ bluetoothResults);
 //                second condition only in learning
-                if (bluetoothResults.length()>5 && counter_n>6){
+                if (isToggleScanTypeChecked==true && counter_n>6 && bluetoothResults.length()>5){
                     Log.e(TAG, "send data objects："+ bluetoothResults);
+                    Log.d(TAG,"isToggleScanTypeChecked inside scanservice: "+ isToggleScanTypeChecked);
+                    counter_n=0;
+                    sendData();
+                }
+                else if (isToggleScanTypeChecked==false && bluetoothResults.length()>5){
+                    Log.e(TAG, "send data objects："+ bluetoothResults);
+                    Log.d(TAG,"isToggleScanTypeChecked inside scanservice: "+ isToggleScanTypeChecked);
                     counter_n=0;
                     sendData();
                 }
@@ -201,6 +209,7 @@ public class ScanService extends Service {
         locationName = intent.getStringExtra("locationName");
         serverAddress = intent.getStringExtra("serverAddress");
         allowGPS = intent.getBooleanExtra("allowGPS", false);
+        isToggleScanTypeChecked = intent.getBooleanExtra("isToggleScanTypeChecked", false);
 
         Log.d(TAG, "familyName: " + familyName);
 

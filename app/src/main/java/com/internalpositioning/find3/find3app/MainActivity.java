@@ -247,6 +247,10 @@ public class MainActivity extends AppCompatActivity {
                     ll24.putExtra("serverAddress", serverAddress);
                     ll24.putExtra("locationName", locationName);
                     ll24.putExtra("allowGPS",allowGPS);
+                    ToggleButton toggleScanType = (ToggleButton) findViewById(R.id.toggleScanType);
+                    boolean isToggleScanTypeChecked = toggleScanType.isChecked();
+                    ll24.putExtra("isToggleScanTypeChecked", isToggleScanTypeChecked);
+
                     recurringLl24 = PendingIntent.getBroadcast(MainActivity.this, 0, ll24, PendingIntent.FLAG_CANCEL_CURRENT);
                     alarms = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                     alarms.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.currentThreadTimeMillis(), 60000, recurringLl24);
