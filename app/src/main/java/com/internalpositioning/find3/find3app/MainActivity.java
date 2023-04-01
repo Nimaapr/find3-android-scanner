@@ -217,12 +217,14 @@ public class MainActivity extends AppCompatActivity {
                     boolean allowGPS = ((CheckBox) findViewById(R.id.allowGPS)).isChecked();
                     Log.d(TAG,"allowGPS is checked: "+allowGPS);
                     String locationName = ((EditText) findViewById(R.id.locationName)).getText().toString().toLowerCase();
+                    String locationSafety = ((EditText) findViewById(R.id.locationsafety)).getText().toString().toLowerCase();
 
                     CompoundButton trackingButton = (CompoundButton) findViewById(R.id.toggleScanType);
                     if (trackingButton.isChecked() == false) {
                         locationName = "";
+                        locationSafety="";
                     } else {
-                        if (locationName.equals("")) {
+                        if (locationName.equals("") || locationSafety.equals("")) {
                             rssi_msg.setText("location name cannot be empty when learning");
                             buttonView.toggle();
                             return;
@@ -245,7 +247,9 @@ public class MainActivity extends AppCompatActivity {
                     ll24.putExtra("familyName", familyName);
                     ll24.putExtra("deviceName", deviceName);
                     ll24.putExtra("serverAddress", serverAddress);
-                    ll24.putExtra("locationName", locationName);
+                    String locationNameWhole = locationName + locationSafety;
+                    ll24.putExtra("locationName", locationNameWhole);
+//                    ll24.putExtra("locationName", locationName);
                     ll24.putExtra("allowGPS",allowGPS);
                     ToggleButton toggleScanType = (ToggleButton) findViewById(R.id.toggleScanType);
                     boolean isToggleScanTypeChecked = toggleScanType.isChecked();

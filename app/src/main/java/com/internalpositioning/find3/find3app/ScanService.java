@@ -35,6 +35,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 //************************************************
@@ -75,7 +77,7 @@ public class ScanService extends Service {
     // post data request queue
     RequestQueue queue;
     private JSONObject jsonBody = new JSONObject();
-    private JSONObject bluetoothResults = new JSONObject();
+    private LinkedHashMap<String, Integer> bluetoothResults = new LinkedHashMap<>();
     private JSONObject wifiResults = new JSONObject();
 
     private String familyName = "";
@@ -117,8 +119,8 @@ public class ScanService extends Service {
 //        ******************************************************************************
 //        KBeaconsMgr.KBeaconMgrDelegate beaconMgrExample = new KBeaconsMgr.KBeaconMgrDelegate()
 //        Next two lines should change. They are only for sending every 6 values. Is next line really necessary?
-        bluetoothResults = new JSONObject();
         counter_n=0;
+
         beaconMgrExample = new KBeaconsMgr.KBeaconMgrDelegate()
         {
             //get advertisement packet during scanning callback
@@ -136,32 +138,51 @@ public class ScanService extends Service {
                         continue;
                     }
 //                    ********************************************************************************************* send data// new code
-                    try {
+//                    try {
+//                        bluetoothResults.put(beacon.getName(), beacon.getRssi());
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+                    if (bluetoothResults.containsKey(beacon.getName())) {
+                        // If the beacon is already in the LinkedHashMap, update the RSSI value with the average
+                        int oldRssi = bluetoothResults.get(beacon.getName());
+                        int newRssi = (oldRssi + beacon.getRssi()) / 2;
+                        bluetoothResults.put(beacon.getName(), newRssi);
+                        Log.v(LOG_TAG, "found an existing one:" + oldRssi);
+                    } else {
+                        // If the LinkedHashMap size is at the maximum capacity, remove the first entry
+                        if (bluetoothResults.size() >= 6) {
+                            Iterator<String> iterator = bluetoothResults.keySet().iterator();
+                            if (iterator.hasNext()) {
+                                String firstKey = iterator.next();
+                                bluetoothResults.remove(firstKey);
+                            }
+                        }
+                        // Add the new beacon
                         bluetoothResults.put(beacon.getName(), beacon.getRssi());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        Log.v(LOG_TAG, "found new one"+ beacon.getRssi());
                     }
 //                    **************************************************************************
-                    for (KBAdvPacketBase advPacket : beacon.allAdvPackets()){
-                        switch (advPacket.getAdvType()){
-                            case KBAdvType.Sensor:
-                            {
-                                KBAdvPacketSensor advSensor = (KBAdvPacketSensor)advPacket;
-                                Log.v(LOG_TAG,"Sensor battery level:" + advSensor.getBatteryLevel());
-                                Log.v(LOG_TAG,"Sensor temp:" + advSensor.getTemperature());
-//                                Log.v(LOG_TAG,"Sensor humidity:" + advSensor.getHumidity());
-//                                KBAccSensorValue accPos = advSensor.getAccSensor();
-//                                if (accPos != null) {
-//                                    String strAccValue = String.format(Locale.ENGLISH, "x:%d; y:%d; z:%d",
-//                                            accPos.xAis, accPos.yAis, accPos.zAis);
-//                                    Log.v(LOG_TAG,"Sensor Acc:" + strAccValue);
-//                                }
-                                break;
-                            }
-                            default:
-                                break;
-                        }
-                    }
+//                    for (KBAdvPacketBase advPacket : beacon.allAdvPackets()){
+//                        switch (advPacket.getAdvType()){
+//                            case KBAdvType.Sensor:
+//                            {
+//                                KBAdvPacketSensor advSensor = (KBAdvPacketSensor)advPacket;
+//                                    Log.v(LOG_TAG,"Sensor battery level:" + advSensor.getBatteryLevel());
+////                                Log.v(LOG_TAG,"Sensor temp:" + advSensor.getTemperature());
+////                                Log.v(LOG_TAG,"Sensor humidity:" + advSensor.getHumidity());
+////                                KBAccSensorValue accPos = advSensor.getAccSensor();
+////                                if (accPos != null) {
+////                                    String strAccValue = String.format(Locale.ENGLISH, "x:%d; y:%d; z:%d",
+////                                            accPos.xAis, accPos.yAis, accPos.zAis);
+////                                    Log.v(LOG_TAG,"Sensor Acc:" + strAccValue);
+////                                }
+//                                break;
+//                            }
+//                            default:
+//                                break;
+//                        }
+//                    }
                     //clear all scanned packet
                     beacon.removeAdvPacket();
                 }
@@ -170,13 +191,13 @@ public class ScanService extends Service {
                 Log.d(TAG, "counter n value："+ counter_n);
                 Log.d(TAG, "bluetooth results:"+ bluetoothResults);
 //                second condition only in learning
-                if (isToggleScanTypeChecked==true && counter_n>6 && bluetoothResults.length()>5){
+                if (isToggleScanTypeChecked==true && counter_n>6 && bluetoothResults.size()>5){
                     Log.e(TAG, "send data objects："+ bluetoothResults);
                     Log.d(TAG,"isToggleScanTypeChecked inside scanservice: "+ isToggleScanTypeChecked);
                     counter_n=0;
                     sendData();
                 }
-                else if (isToggleScanTypeChecked==false && bluetoothResults.length()>5){
+                else if (isToggleScanTypeChecked==false && bluetoothResults.size()>5){
                     Log.e(TAG, "send data objects："+ bluetoothResults);
                     Log.d(TAG,"isToggleScanTypeChecked inside scanservice: "+ isToggleScanTypeChecked);
                     counter_n=0;
@@ -339,7 +360,8 @@ public class ScanService extends Service {
             jsonBody.put("l", locationName);
             jsonBody.put("t", System.currentTimeMillis());
             JSONObject sensors = new JSONObject();
-            sensors.put("bluetooth", bluetoothResults);
+            sensors.put("bluetooth", new JSONObject(bluetoothResults));
+//            sensors.put("bluetooth", bluetoothResults);
             sensors.put("wifi", wifiResults);
             jsonBody.put("s", sensors);
             if (allowGPS) {

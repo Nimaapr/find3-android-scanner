@@ -128,10 +128,16 @@
 
             <AutoCompleteTextView
                 android:id="@+id/locationName"
-                android:layout_width="220dp"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:gravity="center"
+                android:inputType="textUri|textPersonName" />
+            <AutoCompleteTextView
+                android:id="@+id/locationsafety"
+                android:layout_width="42dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
                 android:inputType="textUri|textPersonName" />
         </LinearLayout>
 
