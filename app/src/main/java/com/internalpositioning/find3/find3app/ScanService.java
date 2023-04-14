@@ -133,6 +133,7 @@ public class ScanService extends Service {
                     Log.v(LOG_TAG, "beacon name:" + beacon.getName());
                     Log.v(LOG_TAG,"beacon rssi:" + beacon.getRssi());
                     Log.v(LOG_TAG,"beacon Battery Percentage:" + beacon.getBatteryPercent());
+                    if (beacon.getName()==null) continue;
                     String firstThree = beacon.getName().substring(0, 3);
                     if (beacon.getRssi()<-85 && !firstThree.equals("St_")){
                         continue;
@@ -190,14 +191,13 @@ public class ScanService extends Service {
                 counter_n=counter_n+1;
                 Log.d(TAG, "counter n value："+ counter_n);
                 Log.d(TAG, "bluetooth results:"+ bluetoothResults);
-//                second condition only in learning
                 if (isToggleScanTypeChecked==true && counter_n>6 && bluetoothResults.size()>5){
                     Log.e(TAG, "send data objects："+ bluetoothResults);
                     Log.d(TAG,"isToggleScanTypeChecked inside scanservice: "+ isToggleScanTypeChecked);
                     counter_n=0;
                     sendData();
                 }
-                else if (isToggleScanTypeChecked==false && bluetoothResults.size()>5){
+                else if (isToggleScanTypeChecked==false && bluetoothResults.size()>5 && counter_n>3){
                     Log.e(TAG, "send data objects："+ bluetoothResults);
                     Log.d(TAG,"isToggleScanTypeChecked inside scanservice: "+ isToggleScanTypeChecked);
                     counter_n=0;

@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
@@ -351,10 +352,15 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("Websocket", "json error: " + e.toString());
                         }
                         try {
+                            locationName = (json.get("location").toString());
+                            Log.d("Websocket", "locationName: " + locationName);
+                        } catch (Exception e) {
+                            Log.d("Websocket", "locationName json error: " + e.toString());
+                        }
+                        try {
                             sensors = new JSONObject(fingerprint.get("s").toString());
                             deviceName = fingerprint.get("d").toString();
                             familyName = fingerprint.get("f").toString();
-                            locationName = fingerprint.get("l").toString();
                             Log.d("Websocket", "sensors: " + sensors);
                         } catch (Exception e) {
                             Log.d("Websocket", "json error: " + e.toString());
@@ -389,11 +395,21 @@ public class MainActivity extends AppCompatActivity {
 //                        String message = sdf.format(resultdate) + ": " + bluetoothPoints.toString() + " bluetooth and " + wifiPoints.toString() + " wifi points inserted for " + familyName + "/" + deviceName;
                         String message = "1 second ago: added " + bluetoothPoints.toString() + " bluetooth and " + wifiPoints.toString() + " wifi points for " + familyName + "/" + deviceName;
                         oneSecondTimer.resetCounter();
+                        char lastChar = 0;
                         if (locationName.equals("") == false) {
+                            // Extract the last character from locationName
+                            lastChar = locationName.charAt(locationName.length() - 1);
+                            locationName = locationName.substring(0, locationName.length() - 1);
                             message += " at " + locationName;
                         }
                         TextView rssi_msg = (TextView) findViewById(R.id.textOutput);
                         Log.d("Websocket", message);
+                        // Check if the last character is 'd' and change the text color to red
+                        if (lastChar == 'd') {
+                            rssi_msg.setTextColor(Color.RED);
+                        } else {
+                            rssi_msg.setTextColor(Color.BLACK); // Reset the text color to black if the last character is not 'd'
+                        }
                         rssi_msg.setText(message);
 
                     }
