@@ -139,11 +139,6 @@ public class ScanService extends Service {
                         continue;
                     }
 //                    ********************************************************************************************* send data// new code
-//                    try {
-//                        bluetoothResults.put(beacon.getName(), beacon.getRssi());
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
                     if (bluetoothResults.containsKey(beacon.getName())) {
                         // If the beacon is already in the LinkedHashMap, update the RSSI value with the average
                         int oldRssi = bluetoothResults.get(beacon.getName());
@@ -163,28 +158,6 @@ public class ScanService extends Service {
                         bluetoothResults.put(beacon.getName(), beacon.getRssi());
                         Log.v(LOG_TAG, "found new one"+ beacon.getRssi());
                     }
-//                    **************************************************************************
-//                    for (KBAdvPacketBase advPacket : beacon.allAdvPackets()){
-//                        switch (advPacket.getAdvType()){
-//                            case KBAdvType.Sensor:
-//                            {
-//                                KBAdvPacketSensor advSensor = (KBAdvPacketSensor)advPacket;
-//                                    Log.v(LOG_TAG,"Sensor battery level:" + advSensor.getBatteryLevel());
-////                                Log.v(LOG_TAG,"Sensor temp:" + advSensor.getTemperature());
-////                                Log.v(LOG_TAG,"Sensor humidity:" + advSensor.getHumidity());
-////                                KBAccSensorValue accPos = advSensor.getAccSensor();
-////                                if (accPos != null) {
-////                                    String strAccValue = String.format(Locale.ENGLISH, "x:%d; y:%d; z:%d",
-////                                            accPos.xAis, accPos.yAis, accPos.zAis);
-////                                    Log.v(LOG_TAG,"Sensor Acc:" + strAccValue);
-////                                }
-//                                break;
-//                            }
-//                            default:
-//                                break;
-//                        }
-//                    }
-                    //clear all scanned packet
                     beacon.removeAdvPacket();
                 }
 //                ***************************************************************************
