@@ -135,9 +135,9 @@ public class ScanService extends Service {
                     Log.v(LOG_TAG,"beacon Battery Percentage:" + beacon.getBatteryPercent());
                     if (beacon.getName()==null) continue;
                     String firstThree = beacon.getName().substring(0, 3);
-                    if (!firstThree.equals("St_")){
-                        continue;
-                    }
+//                    if (!firstThree.equals("St_")){
+//                        continue;
+//                    }
                     if (beacon.getRssi()<-67){
                         continue;
                     }
