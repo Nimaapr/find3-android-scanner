@@ -135,7 +135,10 @@ public class ScanService extends Service {
                     Log.v(LOG_TAG,"beacon Battery Percentage:" + beacon.getBatteryPercent());
                     if (beacon.getName()==null) continue;
                     String firstThree = beacon.getName().substring(0, 3);
-                    if (beacon.getRssi()<-75 && !firstThree.equals("St_")){
+                    if (!firstThree.equals("St_")){
+                        continue;
+                    }
+                    if (beacon.getRssi()<-67){
                         continue;
                     }
 //                    ********************************************************************************************* send data// new code
@@ -147,7 +150,7 @@ public class ScanService extends Service {
                         Log.v(LOG_TAG, "found an existing one:" + oldRssi);
                     } else {
                         // If the LinkedHashMap size is at the maximum capacity, remove the first entry
-                        if (bluetoothResults.size() >= 6) {
+                        if (bluetoothResults.size() >= 11) {
                             Iterator<String> iterator = bluetoothResults.keySet().iterator();
                             if (iterator.hasNext()) {
                                 String firstKey = iterator.next();
@@ -164,14 +167,14 @@ public class ScanService extends Service {
                 counter_n=counter_n+1;
                 Log.d(TAG, "counter n value："+ counter_n);
                 Log.d(TAG, "bluetooth results:"+ bluetoothResults);
-                if (isToggleScanTypeChecked==true && counter_n>6 && bluetoothResults.size()>5){
+                if (isToggleScanTypeChecked==true && counter_n>0 && bluetoothResults.size()>0){
                     Log.e(TAG, "send data objects："+ bluetoothResults);
                     Log.d(TAG,"isToggleScanTypeChecked inside scanservice: "+ isToggleScanTypeChecked);
                     counter_n=0;
                     sendData();
-//                    bluetoothResults.clear();
+                    bluetoothResults.clear();
                 }
-                else if (isToggleScanTypeChecked==false && bluetoothResults.size()>5 && counter_n>3){
+                else if (isToggleScanTypeChecked==false && bluetoothResults.size()>=6 && counter_n>2){
                     Log.e(TAG, "send data objects："+ bluetoothResults);
                     Log.d(TAG,"isToggleScanTypeChecked inside scanservice: "+ isToggleScanTypeChecked);
                     counter_n=0;
@@ -287,11 +290,11 @@ public class ScanService extends Service {
                     String name = wifiScanList.get(i).BSSID.toLowerCase();
                     int rssi = wifiScanList.get(i).level;
                     Log.v(TAG, "wifi: " + name + " => " + rssi + "dBm");
-                    try {
-                        wifiResults.put(name, rssi);
-                    } catch (Exception e) {
-                        Log.e(TAG, e.toString());
-                    }
+//                    try {
+//                        wifiResults.put(name, rssi);
+//                    } catch (Exception e) {
+//                        Log.e(TAG, e.toString());
+//                    }
                 }
                 sendData();
                 BTAdapter.cancelDiscovery();
